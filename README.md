@@ -3,13 +3,13 @@ My Monitor logs active X11 window over the time.
 
 
 $ mymonitor -h
-NAME:
+### NAME:
   mymonitor - My Monitor logs active X11 window over the time.
 
-SYNOPSIS:
+### SYNOPSIS:
   mymonitor [numberOfDaysAgo | -h]
 
-DESCRIPTION:
+### DESCRIPTION:
   My Monitor is a tool for micro-management.
   Why? It's helpful to think about how you spend your time.
 
@@ -27,7 +27,7 @@ DESCRIPTION:
     of the current date (or <numberOfDaysAgo> days ago).
 
 
-FILES CREATED:
+### FILES CREATED:
   ~/mymonitor/mymonitor-<DATE>.<FORMAT>
 
   <DATE> is in format year-month-day (yyyy-mm-dd).
@@ -40,21 +40,24 @@ FILES CREATED:
          grouped by hour and sorted by minutes.
          Also prints DATE, hour, PID, "command", "window name" and invoked "command line".
 
-AUTHORS:
+### AUTHORS:
   EdemarSantos <edemarsantos@gmail.com> - https://github.com/edemarsantos
 
-CHANGELOG:
+### CHANGELOG:
   v1.0 2017-06-16 Initial production version.
+  
   v1.1 2017-08-10 Beatifying and documentating code.
+  
   v2.0 2017-09-29 Summary files in same path;
     File of daily summary, with minutes spent;
     Optional parameter "number of days ago" to print daily summary.
 
-WISHLIST:
+### WISHLIST:
   - Capture URL of Firefox browser.
+  
   - Capture actual page in Zim Desktop Wiki.
 
-DEPENDENCIES:
+### DEPENDENCIES:
   - For logger:
     xdotool - command-line X11 automation tool
     bash commands: pgrep date cat sed echo
@@ -62,7 +65,9 @@ DEPENDENCIES:
   - For summarizer:
     bash commands: date cat sed echo sort uniq grep awk column
 
-TESTED ON:
+### TESTED ON:
   GNU bash, versão 4.3.48(1)-release (x86_64-pc-linux-gnu)
+  
   xdotool version 3.20150503.1
+  
   Ubuntu 16.04

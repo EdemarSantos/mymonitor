@@ -1,0 +1,131 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" ]]
+then
+## StartOfHelp
+  cat - <<EndOfHelp
+NAME:
+  mymonitor - My Monitor logs active X11 window over the time.
+
+SYNOPSIS:
+  mymonitor [numberOfDaysAgo | -h]
+
+DESCRIPTION:
+  My Monitor is a tool for micro-management.
+  Why? It's helpful to think about how you spend your time.
+
+  Motivation: remember things to fill boring work timesheets.
+
+  Operation: this Bash script have two modules:
+  
+  - The logger: register in a log file (every second)
+    the active window (software being used), 
+    your PID, running parameters, actual title name, 
+    and (wish) details about what is being done in it.
+
+  - The summarizer: is called when the logger is already running.
+    It compiles the summary files and shows the daily summary
+    of the current date (or <numberOfDaysAgo> days ago).
+
+
+FILES CREATED:
+  ~/mymonitor/mymonitor-<DATE>.<FORMAT>
+
+  <DATE> is in format year-month-day (yyyy-mm-dd).
+  <FORMAT> is:
+    log - created by logger, updated every second.
+    mm - created by summarizer. Squeeze and count repeated lines by minute
+    hh - created by summarizer. Squeeze and count repeated lines by hour
+    dd - created by summarizer. Summarize the day.
+         Show minutes and seconds spent on each window (activity),
+         grouped by hour and sorted by minutes.
+         Also prints DATE, hour, PID, "command", "window name" and invoked "command line".
+
+AUTHORS:
+  EdemarSantos <edemarsantos@gmail.com> - https://github.com/edemarsantos
+
+CHANGELOG:
+  v1.0 2017-06-16 Initial production version.
+  v1.1 2017-08-10 Beatifying and documentating code.
+  v2.0 2017-09-29 Summary files in same path;
+    File of daily summary, with minutes spent;
+    Optional parameter "number of days ago" to print daily summary.
+
+WISHLIST:
+  - Capture URL of Firefox browser.
+  - Capture actual page in Zim Desktop Wiki.
+
+DEPENDENCIES:
+  - For logger:
+    xdotool - command-line X11 automation tool
+    bash commands: pgrep date cat sed echo
+
+  - For summarizer:
+    bash commands: date cat sed echo sort uniq grep awk column
+
+TESTED ON:
+  GNU bash, versão 4.3.48(1)-release (x86_64-pc-linux-gnu)
+  xdotool version 3.20150503.1
+  Ubuntu 16.04
+EndOfHelp
+  exit 0
+fi
+
+wdir=~/mymonitor
+
+if (( `pgrep -cx mymonitor` > 1 ))
+then
+    #echo mymonitor: INFO: mymonitor already running.
+  
+    #echo mymonitor: INFO: In the last hour - windows opened for at least 100 seconds:
+    #cat $wdir/mymonitor-`date +%Y-%m-%d`.log | tail -n 3600 | cut -f4,5 | uniq -c | sort -nr | sed '/^     [0-9]/q'
+
+    # Example: monitor last windows
+    # watch "cat ~/mymonitor/mymonitor-2017-06-16.log | tail -n 3600 | cut -f4,5 | uniq -c | sort -nr | sed ''"
+    
+    # Define date (today or, if parameter 1 exists, number of days ago)
+    if [ $# -eq 0 ]
+    then
+        d=`date +%Y-%m-%d`
+    else
+        d=`date +%Y-%m-%d --date -$1day`
+    fi
+    
+    # Define log file or exit
+    f=$wdir/mymonitor-$d
+    [[ ! -f $f.log ]] && echo mymonitor: WARN: Unable to find mymonitor log file: $f.log && exit 1
+
+    ## Summarizer
+    # Compile summary files
+    sed 's/^\(....-..-.....\):..:../\1/' $f.log | sort | uniq -c -f2 > $f.hh
+    sed 's/^\(....-..-.....:..\):../\1/' $f.log | sort | uniq -c -f2 > $f.mm
+    echo -e ' minutes seconds yyyy-mm-dd\thour\tPID\t"command"\t"windowname"\t"cmdline"' > $f.dd
+    cat $f.hh | grep -v '^      ' | sort -nk3 -nk1 | 
+        awk '{printf "%8.0f %s\n", $1/60, $0}' | grep -v '^       0' | column -ts$'\t' >> $f.dd
+    
+    # Print daily summary file
+    cat $f.dd
+    # Enter in mymonitor directory (use `popd` command to jumt to the last used directory)
+    pushd $wdir
+    exit 0
+fi
+
+## Logger
+echo mymonitor: INFO: mymonitor is starting...
+[ ! -d $wdir ] && echo mymonitor: INFO: Creating directory "$wdir" && mkdir $wdir
+while true
+do 
+    # Sleep 1 second and then get PID of active window
+    wpid=$(xdotool sleep 1 getactivewindow getwindowpid)
+    wdt=`date +"%Y-%m-%d\t%H:%M:%S"`
+    # Get command
+    wcomm=`cat /proc/$wpid/comm`
+    # @deprecated wname=`xdotool getwindowfocus getwindowname`
+    wname=`xdotool getactivewindow getwindowname`
+    # Get command line with parameters
+    wcmd=`cat -v /proc/$wpid/cmdline | sed 's/\^@/ /g;s/ $//'`
+    # Strip TAB and time from wdt variable
+    wfile=$wdir/mymonitor-${wdt::10}.log
+    # Append to file
+    echo -e "$wdt\t$wpid\t\"$wcomm\"\t\"$wname\"\t\"$wcmd\"" >> $wfile
+done &

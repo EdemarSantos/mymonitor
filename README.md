@@ -45,19 +45,19 @@ My Monitor logs active X11 window over the time.
   
   `<FORMAT>` is:
     
-    `log` - created by logger, updated every second.
+  - `log` - created by logger, updated every second.
     
-    `mm` - created by summarizer. Squeeze and count repeated lines by minute
+  -  `mm` - created by summarizer. Squeeze and count repeated lines by minute
     
-    `hh` - created by summarizer. Squeeze and count repeated lines by hour
+  -  `hh` - created by summarizer. Squeeze and count repeated lines by hour
     
-    `dd` - created by summarizer. Summarize the day.
+  -  `dd` - created by summarizer. Summarize the day.
     
-         Show minutes and seconds spent on each window (activity),
-         
-         grouped by hour and sorted by minutes.
-         
-         Also prints DATE, hour, PID, "command", "window name" and invoked "command line".
+       Show minutes and seconds spent on each window (activity),
+       
+       grouped by hour and sorted by minutes.
+       
+       Also prints DATE, hour, PID, "command", "window name" and invoked "command line".
 
 ### AUTHORS:
 
@@ -71,21 +71,21 @@ My Monitor logs active X11 window over the time.
   
   v2.0 2017-09-29 Summary files in same path;
   
-    File of daily summary, with minutes spent;
+  File of daily summary, with minutes spent;
     
-    Optional parameter "number of days ago" to print daily summary.
+  Optional parameter "number of days ago" to print daily summary.
 
 ### WISHLIST:
 
   - Capture URL of Firefox browser.
   
-  - Capture actual page in Zim Desktop Wiki.
+  - Capture actual page in [Zim Desktop Wiki](http://zim-wiki.org/).
 
 ### DEPENDENCIES:
 
   - For logger:
   
-    xdotool - command-line X11 automation tool
+    `xdotool` - command-line X11 automation tool
     
     bash commands: pgrep date cat sed echo
 
@@ -99,4 +99,4 @@ My Monitor logs active X11 window over the time.
   
   xdotool version 3.20150503.1
   
-  Ubuntu 16.04
+  Ubuntu 16.04, Ubuntu 18.04.3 using XFCE
